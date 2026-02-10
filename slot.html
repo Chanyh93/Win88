@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>WIN88 · 娱乐老虎机</title>
+  <link rel="stylesheet" href="casino.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">🎰 老虎机</div>
+  <div class="wallet">
+    💰 <span id="coin">0</span>
+    <button onclick="goHome()">返回大厅</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>旋转（每次 100）</h2>
+  <div style="font-size:54px;font-weight:900;margin:10px 0;" id="reel">🍒 🍋 ⭐</div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <button class="vip" onclick="spin()">旋转</button>
+    <button onclick="auto()">自动 10 次</button>
+  </div>
+  <p id="msg">三连一样 = 爆分 +800</p>
+</section>
+
+<script>
+  let coin = Number(localStorage.getItem("coin") || 1000);
+  const coinEl = document.getElementById("coin");
+  const reelEl = document.getElementById("reel");
+  const msgEl = document.getElementById("msg");
+
+  coinEl.textContent = coin;
+  const icons = ["🍒","🍋","⭐","💎","7️⃣"];
+
+  function save(){
+    localStorage.setItem("coin", coin);
+    coinEl.textContent = coin;
+  }
+  function goHome(){ location.href="index.html"; }
+
+  function spin(){
+    if(coin < 100){ alert("余额不足"); return; }
+    coin -= 100;
+
+    const r1 = icons[Math.floor(Math.random()*icons.length)];
+    const r2 = icons[Math.floor(Math.random()*icons.length)];
+    const r3 = icons[Math.floor(Math.random()*icons.length)];
+    reelEl.textContent = `${r1} ${r2} ${r3}`;
+
+    if(r1===r2 && r2===r3){
+      coin += 800;
+      msgEl.textContent = "🎉 爆分！+800";
+    }else if(r1===r2 || r2===r3 || r1===r3){
+      coin += 150;
+      msgEl.textContent = "✨ 小赢！+150";
+    }else{
+      msgEl.textContent = "再来一次！";
+    }
+    save();
+  }
+
+  async function auto(){
+    for(let i=0;i<10;i++){
+      if(coin < 100) break;
+      spin();
+      await new Promise(r=>setTimeout(r,250));
+    }
+  }
+</script>
+</body>
+</html>
