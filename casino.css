@@ -1,77 +1,343 @@
+/* ===== Base ===== */
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --line:#e6eaf2;
+  --shadow: 0 12px 30px rgba(15,23,42,.08);
+  --radius:16px;
+
+  --blue:#2563eb;
+  --orange:#f59e0b;
+  --green:#16a34a;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
 body{
   margin:0;
-  font-family:system-ui;
-  background:#050505;
-  color:#f5e6b3;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.topbar{
+.app{ padding-bottom: 74px; } /* 给底部导航留空间 */
+.container{ width:min(920px, calc(100% - 24px)); margin: 12px auto 0; }
+
+/* ===== AppBar ===== */
+.appbar{
+  position:sticky; top:0; z-index:50;
+  height:56px;
+  background:#ffffff;
+  border-bottom:1px solid var(--line);
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  padding:12px 16px;
-  background:linear-gradient(90deg,#000,#2b0000,#000);
-  border-bottom:1px solid #b08d57;
+  justify-content:space-between;
+  padding:0 12px;
 }
-
-.logo{
-  font-size:22px;
-  font-weight:900;
-  color:#ffd700;
-}
-.logo span{color:#ff3b3b}
-
-.wallet button{
-  margin-left:6px;
-  background:#b08d57;
-  border:none;
-  padding:6px 10px;
-  border-radius:6px;
-  font-weight:700;
-}
-
-.vip{
-  background:#ff3b3b !important;
-  color:#fff;
-}
-
-.hero{
-  text-align:center;
-  padding:30px 16px;
-  background:radial-gradient(circle,#2b0000,#000);
-}
-.hero span{color:#ffd700}
-
-.lobby{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:16px;
-  padding:20px;
-}
-
-.game-card{
-  background:linear-gradient(135deg,#111,#2b0000);
-  border:1px solid #b08d57;
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 0 20px rgba(255,0,0,.25);
+.iconBtn{
+  border:1px solid var(--line);
+  background: #fff;
+  border-radius:12px;
+  width:40px; height:40px;
+  display:grid; place-items:center;
   cursor:pointer;
-  transition:.2s;
 }
-.game-card:hover{
-  transform:scale(1.03);
-  box-shadow:0 0 30px rgba(255,215,0,.5);
+.brandCenter{
+  display:flex; align-items:center; gap:10px;
+}
+.brandMark{
+  width:36px;height:36px;border-radius:12px;
+  background: linear-gradient(135deg, #3b82f6, #22c55e);
+  display:grid; place-items:center;
+  color:white; font-weight:900;
+}
+.brandText{
+  font-weight:950; letter-spacing:.3px;
+  font-size:18px;
+}
+.brandText span{ color:#f59e0b; }
+
+/* ===== Wallet Card ===== */
+.walletCard{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.walletTop{
+  display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+}
+.walletTitle{
+  font-weight:850;
+  display:flex; align-items:center; gap:8px;
+}
+.eye{
+  border:none;
+  background:#eef2ff;
+  border-radius:10px;
+  padding:6px 8px;
+  cursor:pointer;
+}
+.walletActions{
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+}
+.linkBtn{
+  border:none;
+  background:transparent;
+  color: var(--blue);
+  font-weight:800;
+  cursor:pointer;
+}
+.pillBtn{
+  border:none;
+  background:#e8f0ff;
+  color: var(--blue);
+  font-weight:900;
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+}
+.walletBottom{
+  margin-top:12px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.balancePill{
+  display:flex; align-items:baseline; gap:10px;
+  background:#f1f5ff;
+  border:1px solid #dbe7ff;
+  border-radius:999px;
+  padding:10px 12px;
+  min-width: 180px;
+}
+.ccy{ color: var(--muted); font-weight:800; font-size:12px; }
+.amt{ font-weight:950; font-size:22px; }
+.syncBtn{
+  width:44px;height:44px;border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+}
+.miniIconBtn{
+  width:44px;height:44px;border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+}
+.subRow{
+  margin-top:10px;
+  display:flex; justify-content:center;
+}
+.muted{ color: var(--muted); font-weight:700; }
+
+/* ===== Tabs ===== */
+.tabs{
+  margin-top:12px;
+  display:flex; gap:10px;
+  overflow:auto;
+  padding: 2px 2px 10px;
+}
+.tab{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius: 999px;
+  padding:10px 14px;
+  font-weight:900;
+  color: var(--muted);
+  cursor:pointer;
+}
+.tab.active{
+  color:#0b1220;
+  border-color:#dbe7ff;
+  background:#eef2ff;
 }
 
-footer{
-  text-align:center;
-  padding:20px;
+/* ===== Providers ===== */
+.providers{ display:grid; gap:12px; margin-top:2px; }
+.providerCard{
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:10px;
 }
-.real{
-  background:linear-gradient(135deg,#ff3b3b,#ffd700);
-  border:none;
-  padding:14px 26px;
-  font-size:16px;
-  border-radius:30px;
+.providerCard.promo{ border-color:#dbe7ff; }
+.providerCard.hot{ border-color:#ffe7c2; }
+
+.providerLeft{ display:flex; flex-direction:column; justify-content:center; gap:6px; }
+.providerLogo{
+  font-weight:950;
+  color: var(--blue);
+  letter-spacing:.4px;
+}
+.providerName{
   font-weight:900;
+  color: #334155;
+}
+.providerBtns{ display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+.ctaBtn{
+  border:none;
+  background: var(--orange);
+  color:#fff;
+  font-weight:950;
+  padding:10px 14px;
+  border-radius: 999px;
+  cursor:pointer;
+}
+.ghostBtn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:#334155;
+  font-weight:900;
+  padding:10px 14px;
+  border-radius: 999px;
+  cursor:pointer;
+}
+
+.providerRight{
+  position:relative;
+  width: 210px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eff6ff, #fff7ed);
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.badge{
+  position:absolute; top:10px; right:10px;
+  background:#e8f0ff;
+  color: var(--blue);
+  font-weight:950;
+  border-radius: 999px;
+  padding:6px 10px;
+  border:1px solid #dbe7ff;
+}
+.hotBadge{
+  background:#fff7ed;
+  color:#b45309;
+  border-color:#ffe7c2;
+}
+.players{
+  position:absolute;
+  left:12px; right:12px;
+  bottom:10px;
+  display:flex; justify-content:flex-end; gap:8px;
+}
+.p{
+  width:44px; height:44px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(37,99,235,.25), rgba(34,197,94,.18));
+  border:1px solid rgba(148,163,184,.35);
+}
+
+/* ===== Legal ===== */
+.legal{
+  margin: 12px 4px 0;
+  color: var(--muted);
+  font-weight:700;
+  font-size:12px;
+}
+
+/* ===== Floating Chat ===== */
+.floatChat{
+  position:fixed;
+  right:16px;
+  bottom: 86px;
+  width:62px;
+  height:62px;
+  border-radius: 999px;
+  border:none;
+  background: var(--blue);
+  color:#fff;
+  font-size:22px;
+  box-shadow: 0 16px 40px rgba(37,99,235,.28);
+  cursor:pointer;
+}
+
+/* ===== Bottom Nav ===== */
+.bottomNav{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  height:66px;
+  background:#fff;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-around;
+  padding:8px 10px;
+  z-index:60;
+}
+.navItem{
+  border:none;
+  background:transparent;
+  color: var(--muted);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-weight:900;
+  cursor:pointer;
+  min-width:72px;
+}
+.navItem span{ font-size:11px; }
+.navItem.active{ color: var(--blue); }
+
+/* ===== Sheet ===== */
+.sheet{ display:none; }
+.sheet.show{ display:block; }
+.sheetMask{
+  position:fixed; inset:0;
+  background: rgba(15,23,42,.45);
+  z-index:90;
+}
+.sheetCard{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  background:#fff;
+  border-radius: 18px 18px 0 0;
+  border-top:1px solid var(--line);
+  z-index:95;
+  padding: 12px;
+  box-shadow: 0 -18px 40px rgba(15,23,42,.18);
+}
+.sheetTop{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.sheetTitle{ font-weight:950; }
+.sheetBody{ margin-top:10px; display:grid; gap:10px; }
+.rowLine{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius: 14px;
+  background:#fafbff;
+}
+.ctaWide{
+  border:none;
+  background: var(--orange);
+  color:#fff;
+  font-weight:950;
+  padding:12px 14px;
+  border-radius: 14px;
+  cursor:pointer;
+}
+.ghostWide{
+  border:1px solid var(--line);
+  background:#fff;
+  color:#0f172a;
+  font-weight:950;
+  padding:12px 14px;
+  border-radius: 14px;
+  cursor:pointer;
+}
+
+/* Mobile tuning */
+@media (min-width: 900px){
+  .providerRight{ width: 320px; }
 }
