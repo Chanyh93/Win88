@@ -3,179 +3,322 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>WIN88 · 娱乐百家乐</title>
+  <title>WIN88 · 百家乐</title>
   <link rel="stylesheet" href="casino.css"/>
 </head>
-<body>
-<header class="topbar">
-  <div class="logo">🎴 百家乐</div>
-  <div class="wallet">
-    💰 <span id="coin">0</span>
-    <button onclick="goHome()">返回大厅</button>
+<body class="app">
+
+<header class="appbar">
+  <button class="iconBtn" onclick="location.href='index.html'">‹</button>
+  <div class="brandCenter">
+    <div class="brandMark">🎴</div>
+    <div class="brandText">Baccarat</div>
   </div>
+  <button class="iconBtn" onclick="location.href='vip.html'">👑</button>
 </header>
 
-<section class="hero">
-  <h2>下注（娱乐币）</h2>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-    <button onclick="setBet('player')">闲</button>
-    <button onclick="setBet('banker')">庄</button>
-    <button onclick="setBet('tie')">和</button>
-    <button class="vip" onclick="deal()">发牌</button>
-  </div>
-  <p id="betTip">当前下注：未选择（每局扣 100）</p>
-</section>
+<main class="container">
 
-<section class="hero">
-  <h2>牌面</h2>
-  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-    <div class="game-card" style="min-width:260px" >
-      <h3>闲 Player</h3>
-      <div id="pCards" style="font-size:28px;">—</div>
-      <p>点数：<span id="pPoint">0</span></p>
+  <section class="walletCard">
+    <div class="walletTop">
+      <div class="walletTitle">Balance</div>
+      <div class="walletActions">
+        <button class="pillBtn" onclick="repeatBet()">Repeat</button>
+        <button class="pillBtn" onclick="clearBet()">Clear</button>
+        <button class="pillBtn" onclick="doubleBet()">Double</button>
+      </div>
     </div>
-    <div class="game-card" style="min-width:260px" >
-      <h3>庄 Banker</h3>
-      <div id="bCards" style="font-size:28px;">—</div>
-      <p>点数：<span id="bPoint">0</span></p>
+    <div class="walletBottom">
+      <div class="balancePill">
+        <span class="ccy">COIN</span>
+        <span class="amt" id="coin">—</span>
+      </div>
+      <button class="syncBtn" onclick="deal()">Deal</button>
     </div>
-  </div>
+    <div class="subRow">
+      <div class="muted" id="tip">选择筹码并下注（娱乐币）</div>
+    </div>
+  </section>
 
-  <h2 id="result" style="margin-top:16px;">等待发牌</h2>
+  <section class="walletCard" style="margin-top:12px">
+    <div class="walletTop">
+      <div class="walletTitle">Chips</div>
+      <div class="walletActions" style="gap:8px">
+        <button class="tab" onclick="setChip(10)">10</button>
+        <button class="tab" onclick="setChip(50)">50</button>
+        <button class="tab active" id="chip100" onclick="setChip(100)">100</button>
+        <button class="tab" onclick="setChip(500)">500</button>
+        <button class="tab" onclick="setChip(1000)">1000</button>
+      </div>
+    </div>
 
-  <div style="margin-top:10px;">
-    <p>路单（最近 12 局）：</p>
-    <div id="road" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
-  </div>
-</section>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <div class="providerCard" onclick="addBet('player')" style="cursor:pointer">
+        <div class="providerLeft">
+          <div class="providerLogo">PLAYER</div>
+          <div class="providerName">闲 1:1</div>
+          <div class="muted">Bet: <b id="bet_player">0</b></div>
+        </div>
+      </div>
 
-<script>
-  // ====== 基础钱包 ======
-  let coin = Number(localStorage.getItem("coin") || 1000);
-  const coinEl = document.getElementById("coin");
-  coinEl.textContent = coin;
+      <div class="providerCard" onclick="addBet('banker')" style="cursor:pointer">
+        <div class="providerLeft">
+          <div class="providerLogo">BANKER</div>
+          <div class="providerName">庄 0.95:1</div>
+          <div class="muted">Bet: <b id="bet_banker">0</b></div>
+        </div>
+      </div>
 
-  function saveCoin(){
-    localStorage.setItem("coin", coin);
-    coinEl.textContent = coin;
+      <div class="providerCard" onclick="addBet('tie')" style="cursor:pointer">
+        <div class="providerLeft">
+          <div class="providerLogo">TIE</div>
+          <div class="providerName">和 8:1</div>
+          <div class="muted">Bet: <b id="bet_tie">0</b></div>
+        </div>
+      </div>
+
+      <div class="providerCard" onclick="addBet('ppair')" style="cursor:pointer">
+        <div class="providerLeft">
+          <div class="providerLogo">P PAIR</div>
+          <div class="providerName">闲对 11:1</div>
+          <div class="muted">Bet: <b id="bet_ppair">0</b></div>
+        </div>
+      </div>
+
+      <div class="providerCard" onclick="addBet('bpair')" style="cursor:pointer">
+        <div class="providerLeft">
+          <div class="providerLogo">B PAIR</div>
+          <div class="providerName">庄对 11:1</div>
+          <div class="muted">Bet: <b id="bet_bpair">0</b></div>
+        </div>
+      </div>
+
+      <div class="providerCard" style="cursor:default">
+        <div class="providerLeft">
+          <div class="providerLogo">ROAD</div>
+          <div class="providerName">最近 20 局</div>
+          <div id="road" class="muted" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="walletCard" style="margin-top:12px">
+    <div class="walletTop">
+      <div class="walletTitle">Cards</div>
+      <div class="walletActions"><button class="linkBtn" onclick="location.reload()">Reset UI</button></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <div class="rowLine">
+        <span><b>PLAYER</b></span>
+        <span id="pCards">—</span>
+        <b id="pPoint">0</b>
+      </div>
+      <div class="rowLine">
+        <span><b>BANKER</b></span>
+        <span id="bCards">—</span>
+        <b id="bPoint">0</b>
+      </div>
+    </div>
+
+    <div style="margin-top:10px" class="muted" id="result">等待下注</div>
+  </section>
+
+  <p class="legal">18+ 娱乐用途 · 虚拟娱乐币 · 无真实赌博/无兑现</p>
+</main>
+
+<script type="module">
+import { getCoin, setCoin, onPlay, vipParams } from "./progress.js";
+
+let coin = getCoin();
+const coinEl = document.getElementById("coin");
+
+let chip = 100;
+const bets = { player:0, banker:0, tie:0, ppair:0, bpair:0 };
+let lastBets = { ...bets };
+
+const roadKey = "road_baccarat20";
+let road = JSON.parse(localStorage.getItem(roadKey) || "[]"); // 'P' 'B' 'T'
+
+function saveCoin(){ setCoin(coin); coinEl.textContent = coin; }
+function renderBets(){
+  for(const k of Object.keys(bets)){
+    document.getElementById("bet_"+k).textContent = bets[k];
   }
-  function goHome(){ window.location.href = "index.html"; }
+}
+function renderRoad(){
+  const box = document.getElementById("road");
+  box.innerHTML = "";
+  road.slice(0,20).forEach(x=>{
+    const d = document.createElement("span");
+    d.textContent = x;
+    d.style.display="inline-grid";
+    d.style.placeItems="center";
+    d.style.width="26px";
+    d.style.height="26px";
+    d.style.borderRadius="10px";
+    d.style.border="1px solid #e6eaf2";
+    d.style.background= x==="P" ? "#eef2ff" : x==="B" ? "#fff7ed" : "#ecfeff";
+    box.appendChild(d);
+  });
+}
 
-  // ====== 百家乐逻辑（娱乐版，简单但像样）======
-  const suits = ["♠️","♥️","♦️","♣️"];
-  function drawCard(){
-    // 0-9 点：A=1, 2-9=本身, 10/J/Q/K=0
-    const r = Math.floor(Math.random()*13) + 1;
-    let v = r;
-    if(r === 1) v = 1;
-    else if(r >= 10) v = 0;
-    return { r, v, s: suits[Math.floor(Math.random()*4)] };
-  }
-  function cardText(c){
-    const map = {1:"A",11:"J",12:"Q",13:"K"};
-    const face = map[c.r] || String(c.r);
-    return face + c.s;
-  }
-  function handPoint(hand){
-    return hand.reduce((a,c)=>a+c.v,0) % 10;
-  }
+saveCoin(); renderBets(); renderRoad();
 
-  let bet = null;
-  function setBet(t){
-    bet = t;
-    document.getElementById("betTip").textContent = `当前下注：${t.toUpperCase()}（每局扣 100）`;
-  }
+window.setChip = (v)=>{
+  chip = v;
+  document.querySelectorAll(".tabs .tab").forEach(()=>{});
+  document.getElementById("tip").textContent = `当前筹码：${chip}（点击下注区累加）`;
+};
 
-  // 路单
-  const roadKey = "baccarat_road";
-  let road = JSON.parse(localStorage.getItem(roadKey) || "[]");
-  renderRoad();
+window.addBet = (type)=>{
+  if(coin < chip){ alert("余额不足"); return; }
+  bets[type] += chip;
+  coin -= chip;
+  saveCoin();
+  renderBets();
+};
 
-  function pushRoad(w){
-    road.unshift(w);
-    road = road.slice(0,12);
-    localStorage.setItem(roadKey, JSON.stringify(road));
-    renderRoad();
-  }
+window.clearBet = ()=>{
+  // 退回全部下注
+  let refund = 0;
+  for(const k in bets){ refund += bets[k]; bets[k]=0; }
+  coin += refund;
+  saveCoin();
+  renderBets();
+};
 
-  function renderRoad(){
-    const box = document.getElementById("road");
-    box.innerHTML = "";
-    road.forEach(w=>{
-      const d = document.createElement("div");
-      d.className="card";
-      d.style.width="40px";
-      d.style.height="40px";
-      d.style.borderRadius="12px";
-      d.style.display="grid";
-      d.style.placeItems="center";
-      d.style.fontWeight="900";
-      d.textContent = w==="player" ? "闲" : w==="banker" ? "庄" : "和";
-      if(w==="tie") d.style.borderColor = "rgba(44,255,210,.7)";
-      box.appendChild(d);
-    });
-  }
+window.repeatBet = ()=>{
+  // 重复上局下注（若余额足够）
+  const total = Object.values(lastBets).reduce((a,b)=>a+b,0);
+  if(total<=0){ alert("上一局没有下注"); return; }
+  if(coin < total){ alert("余额不足"); return; }
+  for(const k in bets){ bets[k] += lastBets[k]; }
+  coin -= total;
+  saveCoin();
+  renderBets();
+};
 
-  function deal(){
-    if(!bet){ alert("请先选择下注：闲 / 庄 / 和"); return; }
-    if(coin < 100){ alert("余额不足"); return; }
+window.doubleBet = ()=>{
+  const total = Object.values(bets).reduce((a,b)=>a+b,0);
+  if(total<=0){ alert("请先下注"); return; }
+  if(coin < total){ alert("余额不足"); return; }
+  for(const k in bets){ bets[k] *= 2; }
+  coin -= total;
+  saveCoin();
+  renderBets();
+};
 
-    coin -= 100; // 每局成本
-    saveCoin();
+// ===== 真补牌规则相关 =====
+const suits = ["♠️","♥️","♦️","♣️"];
+function drawCard(){
+  const r = Math.floor(Math.random()*13) + 1; // 1..13
+  let v = r;
+  if(r === 1) v = 1;
+  else if(r >= 10) v = 0;
+  return { r, v, s: suits[Math.floor(Math.random()*4)] };
+}
+function cardText(c){
+  const map = {1:"A",11:"J",12:"Q",13:"K"};
+  const face = map[c.r] || String(c.r);
+  return face + c.s;
+}
+function point(hand){ return hand.reduce((a,c)=>a+c.v,0) % 10; }
 
-    // 初始牌
-    const p = [drawCard(), drawCard()];
-    const b = [drawCard(), drawCard()];
+function bankerDrawRule(bPoint, pThirdV){
+  // 庄补牌规则（核心）
+  // bPoint 0-2 必补；3 在 pThird!=8 补；4 在 pThird 2-7 补；5 在 pThird 4-7 补；
+  // 6 在 pThird 6-7 补；7 停
+  if(bPoint <= 2) return true;
+  if(bPoint === 3) return pThirdV !== 8;
+  if(bPoint === 4) return (pThirdV >= 2 && pThirdV <= 7);
+  if(bPoint === 5) return (pThirdV >= 4 && pThirdV <= 7);
+  if(bPoint === 6) return (pThirdV === 6 || pThirdV === 7);
+  return false;
+}
 
-    // 简化补牌规则（接近真实但不追求完全一致）
-    let pPoint = handPoint(p);
-    let bPoint = handPoint(b);
+window.deal = ()=>{
+  const totalBet = Object.values(bets).reduce((a,b)=>a+b,0);
+  if(totalBet<=0){ alert("请先下注"); return; }
 
-    // 若任一方天生 8/9 直接停
-    if(!(pPoint>=8 || bPoint>=8)){
-      // 闲点数<=5补一张
-      if(pPoint <= 5){
-        p.push(drawCard());
-        pPoint = handPoint(p);
-      }
-      // 庄点数<=5补一张（简化）
+  // 记录上局下注（用于 Repeat）
+  lastBets = { ...bets };
+
+  const p = [drawCard(), drawCard()];
+  const b = [drawCard(), drawCard()];
+
+  const pPair = (p[0].r === p[1].r);
+  const bPair = (b[0].r === b[1].r);
+
+  let pPoint = point(p);
+  let bPoint = point(b);
+
+  // 自然胜
+  if(!(pPoint>=8 || bPoint>=8)){
+    // 闲补牌：0-5 补，6-7 停
+    let pThird = null;
+    if(pPoint <= 5){
+      pThird = drawCard();
+      p.push(pThird);
+      pPoint = point(p);
+    }
+    // 庄补牌
+    if(pThird === null){
+      // 闲没补牌：庄 0-5 补，6-7 停
       if(bPoint <= 5){
         b.push(drawCard());
-        bPoint = handPoint(b);
-      }
-    }
-
-    document.getElementById("pCards").textContent = p.map(cardText).join(" ");
-    document.getElementById("bCards").textContent = b.map(cardText).join(" ");
-    document.getElementById("pPoint").textContent = pPoint;
-    document.getElementById("bPoint").textContent = bPoint;
-
-    // 判定胜负
-    let win = "tie";
-    if(pPoint > bPoint) win = "player";
-    if(bPoint > pPoint) win = "banker";
-
-    // 派彩（娱乐）
-    // 闲/庄 赢：返还 200（净赚 100）；和赢：返还 800（净赚 700）
-    let msg = "";
-    if(win === bet){
-      if(win === "tie"){
-        coin += 800;
-        msg = "🎉 你押中【和】！大赢！";
-      }else{
-        coin += 200;
-        msg = "🎉 你赢了！";
+        bPoint = point(b);
       }
     }else{
-      msg = "❌ 你输了。";
+      // 闲有第三张：按规则
+      if(bankerDrawRule(bPoint, pThird.v)){
+        b.push(drawCard());
+        bPoint = point(b);
+      }
     }
-
-    saveCoin();
-    pushRoad(win);
-
-    document.getElementById("result").textContent =
-      `${msg} 结果：${win==="player"?"闲":win==="banker"?"庄":"和"}（余额 ${coin}）`;
   }
+
+  // 更新牌面
+  document.getElementById("pCards").textContent = p.map(cardText).join(" ");
+  document.getElementById("bCards").textContent = b.map(cardText).join(" ");
+  document.getElementById("pPoint").textContent = pPoint;
+  document.getElementById("bPoint").textContent = bPoint;
+
+  // 胜负
+  const winMain = (pPoint>bPoint) ? "player" : (bPoint>pPoint) ? "banker" : "tie";
+  road.unshift(winMain==="player"?"P":winMain==="banker"?"B":"T");
+  road = road.slice(0,20);
+  localStorage.setItem(roadKey, JSON.stringify(road));
+  renderRoad();
+
+  // 派彩（娱乐）
+  const { winBoost } = vipParams();
+  let payout = 0;
+
+  // 主注
+  if(bets.player>0 && winMain==="player") payout += Math.floor(bets.player * 2 * winBoost);
+  if(bets.banker>0 && winMain==="banker") payout += Math.floor((bets.banker + bets.banker*0.95) * winBoost); // 本金+0.95
+  if(bets.tie>0 && winMain==="tie") payout += Math.floor((bets.tie + bets.tie*8) * winBoost); // 本金+8倍
+
+  // 对子
+  if(bets.ppair>0 && pPair) payout += Math.floor((bets.ppair + bets.ppair*11) * winBoost);
+  if(bets.bpair>0 && bPair) payout += Math.floor((bets.bpair + bets.bpair*11) * winBoost);
+
+  coin += payout;
+  saveCoin();
+
+  // 清空下注
+  for(const k in bets) bets[k]=0;
+  renderBets();
+
+  // 任务进度
+  const task = onPlay("baccarat");
+  const taskText = task.got>0 ? `✅ 任务完成 +${task.got}` : `任务 ${task.plays}/${task.target}`;
+
+  document.getElementById("result").textContent =
+    `结果：${winMain==="player"?"闲":"庄/和".includes(winMain) ? (winMain==="banker"?"庄":"和") : winMain}｜派彩 +${payout}｜${taskText}`;
+};
 </script>
 </body>
-</html
+</html>
