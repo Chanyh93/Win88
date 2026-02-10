@@ -13,7 +13,15 @@ function addCoin(){
 }
 
 function openGame(type){
-  alert("即将进入：" + type + "（STEP 2 实装）");
+  if(type === "baccarat"){
+    window.location.href = "baccarat.html";
+  }
+  if(type === "slot"){
+    window.location.href = "slot.html";
+  }
+  if(type === "crash"){
+    window.location.href = "crash.html";
+  }
 }
 
 function goReal(){
