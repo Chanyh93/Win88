@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FunHub — AI 娱乐空间</title>
+  <meta name="description" content="一个高级质感的娱乐站：小游戏、AI文案、壁纸与排行榜。"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="grid"></div>
+  </div>
+
+  <header class="header">
+    <div class="wrap row">
+      <div class="brand">
+        <span class="logo">FH</span>
+        <span class="name">FunHub</span>
+      </div>
+      <nav class="nav">
+        <a href="#features">功能</a>
+        <a href="#games">小游戏</a>
+        <a href="#pricing">会员</a>
+        <a href="#footer">联系</a>
+      </nav>
+      <div class="cta">
+        <button class="btn ghost" id="themeBtn">切换主题</button>
+        <a class="btn primary" href="#pricing">开通会员</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="heroLeft">
+        <div class="pill">✨ 全新上线 · 高级AI娱乐站</div>
+        <h1>一个看起来就很“贵”的<br/>AI 娱乐空间</h1>
+        <p class="lead">
+          小游戏 + AI 文案 + 壁纸素材 + 排行榜。你负责引流，我们负责质感与体验。
+        </p>
+        <div class="heroBtns">
+          <a class="btn primary" href="#games">立即开始</a>
+          <button class="btn ghost" id="openModal">看看会员权益</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="num" id="visits">—</div>
+            <div class="txt">今日访问</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="plays">—</div>
+            <div class="txt">小游戏次数</div>
+          </div>
+          <div class="stat">
+            <div class="num">4.9★</div>
+            <div class="txt">用户评分</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="heroCard">
+        <div class="cardTop">
+          <div class="chip"></div>
+          <div class="cardTitle">今日挑战</div>
+        </div>
+        <div class="cardBody">
+          <div class="mini">
+            <div class="miniTitle">幸运翻牌</div>
+            <p>翻到「金色」就加分。每日刷新排行榜。</p>
+            <div class="miniRow">
+              <button class="btn primary" id="flipBtn">翻牌</button>
+              <div class="score">分数：<span id="score">0</span></div>
+            </div>
+            <div class="cards" id="cards"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="mini">
+            <div class="miniTitle">AI 一句话生成器</div>
+            <p>输入关键词，生成可发社媒的“高级文案”。</p>
+            <div class="miniRow">
+              <input id="kw" class="input" placeholder="例如：夜景、机车、海边" />
+              <button class="btn ghost" id="genBtn">生成</button>
+            </div>
+            <div class="output" id="out">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <h2>功能区</h2>
+      <p class="muted">先做一个“能火”的基础版，后面再接会员/广告/支付。</p>
+
+      <div class="cards3">
+        <article class="fcard">
+          <div class="icon">🎮</div>
+          <h3>小游戏中心</h3>
+          <p>轻量、好玩、可做排行榜，适合短视频引流。</p>
+        </article>
+        <article class="fcard">
+          <div class="icon">🧠</div>
+          <h3>AI 文案/标题</h3>
+          <p>一键生成“像大号”一样的语气文案，提升转发。</p>
+        </article>
+        <article class="fcard">
+          <div class="icon">💎</div>
+          <h3>会员系统</h3>
+          <p>去广告、更多主题、更多玩法、专属内容入口。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="games" class="section">
+      <h2>小游戏</h2>
+      <div class="gameGrid">
+        <div class="gcard">
+          <div class="gtitle">幸运翻牌</div>
+          <p class="muted">刚才右边那一套：适合做每日挑战。</p>
+          <button class="btn primary" onclick="document.getElementById('flipBtn').click()">去玩</button>
+        </div>
+        <div class="gcard">
+          <div class="gtitle">反应速度（Demo）</div>
+          <p class="muted">点击开始，随机时间出现“GO”，越快越高分。</p>
+          <button class="btn ghost" id="rtStart">开始</button>
+          <div class="rtBox" id="rtBox">等待开始…</div>
+        </div>
+        <div class="gcard">
+          <div class="gtitle">每日抽卡（占位）</div>
+          <p class="muted">后续可加入更多玩法/会员专属内容。</p>
+          <a class="btn ghost" href="#pricing">解锁更多</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="section pricing">
+      <h2>会员（可后续接 Stripe 等合规支付）</h2>
+      <div class="priceGrid">
+        <div class="pcard">
+          <h3>Free</h3>
+          <div class="price">RM0</div>
+          <ul>
+            <li>基础小游戏</li>
+            <li>基础文案生成</li>
+            <li>带广告</li>
+          </ul>
+          <button class="btn ghost" disabled>当前</button>
+        </div>
+        <div class="pcard hot">
+          <div class="tag">最受欢迎</div>
+          <h3>Pro</h3>
+          <div class="price">RM19<span>/月</span></div>
+          <ul>
+            <li>去广告</li>
+            <li>更多主题皮肤</li>
+            <li>排行榜/挑战模式</li>
+            <li>专属内容入口</li>
+          </ul>
+          <button class="btn primary" id="buyBtn">模拟购买</button>
+          <div class="hint">先用“模拟购买”跑通流程，再接真实支付。</div>
+        </div>
+        <div class="pcard">
+          <h3>Creator</h3>
+          <div class="price">RM49<span>/月</span></div>
+          <ul>
+            <li>全部 Pro 权益</li>
+            <li>自定义落地页</li>
+            <li>引流素材包</li>
+          </ul>
+          <button class="btn ghost" id="contactBtn">联系开通</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="wrap row">
+      <div class="footLeft">
+        <div class="brand small">
+          <span class="logo">FH</span><span class="name">FunHub</span>
+        </div>
+        <p class="muted">© <span id="year"></span> FunHub. All rights reserved.</p>
+      </div>
+      <div class="footRight">
+        <a href="#">隐私</a>
+        <a href="#">条款</a>
+        <a href="#">合作</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div class="modalTitle">会员权益</div>
+        <button class="x" id="closeModal">✕</button>
+      </div>
+      <div class="modalBody">
+        <ul class="list">
+          <li>✅ 去广告（更像“正规产品”）</li>
+          <li>✅ 主题皮肤（高级感拉满）</li>
+          <li>✅ 排行榜 + 每日挑战（留存）</li>
+          <li>✅ 会员专属内容入口（后续可卖数字产品）</li>
+        </ul>
+        <button class="btn primary" id="modalBuy">我想开通（模拟）</button>
+        <p class="muted small">注：这里先做“模拟购买”，上线后再接合规支付。</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
