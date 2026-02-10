@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>WIN88 · Crash</title>
+  <link rel="stylesheet" href="casino.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">💥 Crash</div>
+  <div class="wallet">
+    💰 <span id="coin">0</span>
+    <button onclick="goHome()">返回大厅</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>翻倍中：<span id="multi">1.00x</span></h2>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <button class="vip" onclick="start()">开始（100）</button>
+    <button onclick="cashout()">退出兑现</button>
+  </div>
+  <p id="msg">提示：越久倍数越高，但随时可能爆。</p>
+</section>
+
+<section class="hero">
+  <div class="game-card" style="max-width:520px;margin:0 auto;">
+    <h3>实时倍数</h3>
+    <div style="font-size:46px;font-weight:950" id="big">1.00x</div>
+  </div>
+</section>
+
+<script>
+  let coin = Number(localStorage.getItem("coin") || 1000);
+  const coinEl = document.getElementById("coin");
+  const multiEl = document.getElementById("multi");
+  const bigEl = document.getElementById("big");
+  const msgEl = document.getElementById("msg");
+
+  coinEl.textContent = coin;
+
+  let timer = null;
+  let mult = 1;
+  let running = false;
+
+  function save(){
+    localStorage.setItem("coin", coin);
+    coinEl.textContent = coin;
+  }
+  function goHome(){ location.href="index.html"; }
+
+  function start(){
+    if(running) return;
+    if(coin < 100){ alert("余额不足"); return; }
+
+    coin -= 100;
+    save();
+
+    running = true;
+    mult = 1;
+    setUI();
+
+    timer = setInterval(()=>{
+      // 增长
+      mult += 0.06 + Math.random()*0.04;
+
+      // 爆炸概率随倍数上升（更像赌场）
+      const boomChance = Math.min(0.02 + mult*0.01, 0.35);
+
+      if(Math.random() < boomChance){
+        stopRun(true);
+        return;
+      }
+      setUI();
+    }, 220);
+
+    msgEl.textContent = "进行中…随时退出兑现！";
+  }
+
+  function setUI(){
+    const t = mult.toFixed(2) + "x";
+    multiEl.textContent = t;
+    bigEl.textContent = t;
+  }
+
+  function stopRun(boom){
+    clearInterval(timer);
+    timer = null;
+    running = false;
+
+    if(boom){
+      msgEl.textContent = "💥 爆了！本局归零";
+      mult = 1;
+      setUI();
+    }
+  }
+
+  function cashout(){
+    if(!running){ alert("还没开始"); return; }
+    clearInterval(timer);
+    timer = null;
+    running = false;
+
+    const win = Math.floor(100 * mult);
+    coin += win;
+    save();
+
+    msgEl.textContent = `🎉 退出成功 +${win}（倍率 ${mult.toFixed(2)}x）`;
+    mult = 1;
+    setUI();
+  }
+</script>
+</body>
+</html>
