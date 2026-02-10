@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>WIN88 · 娱乐百家乐</title>
+  <link rel="stylesheet" href="casino.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">🎴 百家乐</div>
+  <div class="wallet">
+    💰 <span id="coin">0</span>
+    <button onclick="goHome()">返回大厅</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>下注（娱乐币）</h2>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <button onclick="setBet('player')">闲</button>
+    <button onclick="setBet('banker')">庄</button>
+    <button onclick="setBet('tie')">和</button>
+    <button class="vip" onclick="deal()">发牌</button>
+  </div>
+  <p id="betTip">当前下注：未选择（每局扣 100）</p>
+</section>
+
+<section class="hero">
+  <h2>牌面</h2>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    <div class="game-card" style="min-width:260px" >
+      <h3>闲 Player</h3>
+      <div id="pCards" style="font-size:28px;">—</div>
+      <p>点数：<span id="pPoint">0</span></p>
+    </div>
+    <div class="game-card" style="min-width:260px" >
+      <h3>庄 Banker</h3>
+      <div id="bCards" style="font-size:28px;">—</div>
+      <p>点数：<span id="bPoint">0</span></p>
+    </div>
+  </div>
+
+  <h2 id="result" style="margin-top:16px;">等待发牌</h2>
+
+  <div style="margin-top:10px;">
+    <p>路单（最近 12 局）：</p>
+    <div id="road" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+  </div>
+</section>
+
+<script>
+  // ====== 基础钱包 ======
+  let coin = Number(localStorage.getItem("coin") || 1000);
+  const coinEl = document.getElementById("coin");
+  coinEl.textContent = coin;
+
+  function saveCoin(){
+    localStorage.setItem("coin", coin);
+    coinEl.textContent = coin;
+  }
+  function goHome(){ window.location.href = "index.html"; }
+
+  // ====== 百家乐逻辑（娱乐版，简单但像样）======
+  const suits = ["♠️","♥️","♦️","♣️"];
+  function drawCard(){
+    // 0-9 点：A=1, 2-9=本身, 10/J/Q/K=0
+    const r = Math.floor(Math.random()*13) + 1;
+    let v = r;
+    if(r === 1) v = 1;
+    else if(r >= 10) v = 0;
+    return { r, v, s: suits[Math.floor(Math.random()*4)] };
+  }
+  function cardText(c){
+    const map = {1:"A",11:"J",12:"Q",13:"K"};
+    const face = map[c.r] || String(c.r);
+    return face + c.s;
+  }
+  function handPoint(hand){
+    return hand.reduce((a,c)=>a+c.v,0) % 10;
+  }
+
+  let bet = null;
+  function setBet(t){
+    bet = t;
+    document.getElementById("betTip").textContent = `当前下注：${t.toUpperCase()}（每局扣 100）`;
+  }
+
+  // 路单
+  const roadKey = "baccarat_road";
+  let road = JSON.parse(localStorage.getItem(roadKey) || "[]");
+  renderRoad();
+
+  function pushRoad(w){
+    road.unshift(w);
+    road = road.slice(0,12);
+    localStorage.setItem(roadKey, JSON.stringify(road));
+    renderRoad();
+  }
+
+  function renderRoad(){
+    const box = document.getElementById("road");
+    box.innerHTML = "";
+    road.forEach(w=>{
+      const d = document.createElement("div");
+      d.className="card";
+      d.style.width="40px";
+      d.style.height="40px";
+      d.style.borderRadius="12px";
+      d.style.display="grid";
+      d.style.placeItems="center";
+      d.style.fontWeight="900";
+      d.textContent = w==="player" ? "闲" : w==="banker" ? "庄" : "和";
+      if(w==="tie") d.style.borderColor = "rgba(44,255,210,.7)";
+      box.appendChild(d);
+    });
+  }
+
+  function deal(){
+    if(!bet){ alert("请先选择下注：闲 / 庄 / 和"); return; }
+    if(coin < 100){ alert("余额不足"); return; }
+
+    coin -= 100; // 每局成本
+    saveCoin();
+
+    // 初始牌
+    const p = [drawCard(), drawCard()];
+    const b = [drawCard(), drawCard()];
+
+    // 简化补牌规则（接近真实但不追求完全一致）
+    let pPoint = handPoint(p);
+    let bPoint = handPoint(b);
+
+    // 若任一方天生 8/9 直接停
+    if(!(pPoint>=8 || bPoint>=8)){
+      // 闲点数<=5补一张
+      if(pPoint <= 5){
+        p.push(drawCard());
+        pPoint = handPoint(p);
+      }
+      // 庄点数<=5补一张（简化）
+      if(bPoint <= 5){
+        b.push(drawCard());
+        bPoint = handPoint(b);
+      }
+    }
+
+    document.getElementById("pCards").textContent = p.map(cardText).join(" ");
+    document.getElementById("bCards").textContent = b.map(cardText).join(" ");
+    document.getElementById("pPoint").textContent = pPoint;
+    document.getElementById("bPoint").textContent = bPoint;
+
+    // 判定胜负
+    let win = "tie";
+    if(pPoint > bPoint) win = "player";
+    if(bPoint > pPoint) win = "banker";
+
+    // 派彩（娱乐）
+    // 闲/庄 赢：返还 200（净赚 100）；和赢：返还 800（净赚 700）
+    let msg = "";
+    if(win === bet){
+      if(win === "tie"){
+        coin += 800;
+        msg = "🎉 你押中【和】！大赢！";
+      }else{
+        coin += 200;
+        msg = "🎉 你赢了！";
+      }
+    }else{
+      msg = "❌ 你输了。";
+    }
+
+    saveCoin();
+    pushRoad(win);
+
+    document.getElementById("result").textContent =
+      `${msg} 结果：${win==="player"?"闲":win==="banker"?"庄":"和"}（余额 ${coin}）`;
+  }
+</script>
+</body>
+</html
