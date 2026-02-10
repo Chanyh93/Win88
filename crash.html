@@ -6,110 +6,202 @@
   <title>WIN88 · Crash</title>
   <link rel="stylesheet" href="casino.css"/>
 </head>
-<body>
-<header class="topbar">
-  <div class="logo">💥 Crash</div>
-  <div class="wallet">
-    💰 <span id="coin">0</span>
-    <button onclick="goHome()">返回大厅</button>
+<body class="app">
+
+<header class="appbar">
+  <button class="iconBtn" onclick="location.href='index.html'">‹</button>
+  <div class="brandCenter">
+    <div class="brandMark">💥</div>
+    <div class="brandText">Crash</div>
   </div>
+  <button class="iconBtn" onclick="location.href='vip.html'">👑</button>
 </header>
 
-<section class="hero">
-  <h2>翻倍中：<span id="multi">1.00x</span></h2>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-    <button class="vip" onclick="start()">开始（100）</button>
-    <button onclick="cashout()">退出兑现</button>
-  </div>
-  <p id="msg">提示：越久倍数越高，但随时可能爆。</p>
-</section>
+<main class="container">
+  <section class="walletCard">
+    <div class="walletTop">
+      <div class="walletTitle">Balance</div>
+      <div class="walletActions">
+        <button class="pillBtn" onclick="location.href='partners.html'">Support</button>
+      </div>
+    </div>
+    <div class="walletBottom">
+      <div class="balancePill">
+        <span class="ccy">COIN</span>
+        <span class="amt" id="coin">—</span>
+      </div>
+      <button class="syncBtn" onclick="start()">Start</button>
+    </div>
+    <div class="subRow"><div class="muted" id="msg">设置自动提现倍率（可选）</div></div>
+  </section>
 
-<section class="hero">
-  <div class="game-card" style="max-width:520px;margin:0 auto;">
-    <h3>实时倍数</h3>
-    <div style="font-size:46px;font-weight:950" id="big">1.00x</div>
-  </div>
-</section>
+  <section class="walletCard" style="margin-top:12px">
+    <div class="walletTop">
+      <div class="walletTitle">Auto Cashout</div>
+      <div class="walletActions">
+        <button class="pillBtn" onclick="setAuto(0)">Off</button>
+        <button class="pillBtn" onclick="setAuto(1.50)">1.50x</button>
+        <button class="pillBtn" onclick="setAuto(2.00)">2.00x</button>
+        <button class="pillBtn" onclick="setAuto(3.00)">3.00x</button>
+      </div>
+    </div>
+    <div class="walletBottom">
+      <div class="balancePill" style="min-width:240px">
+        <span class="ccy">Auto</span>
+        <span class="amt" id="autoText">Off</span>
+      </div>
+      <button class="syncBtn" onclick="cashout()">Cashout</button>
+    </div>
+  </section>
 
-<script>
-  let coin = Number(localStorage.getItem("coin") || 1000);
-  const coinEl = document.getElementById("coin");
-  const multiEl = document.getElementById("multi");
-  const bigEl = document.getElementById("big");
-  const msgEl = document.getElementById("msg");
+  <section class="walletCard" style="margin-top:12px">
+    <div class="walletTop">
+      <div class="walletTitle">Multiplier</div>
+      <div class="walletActions"><button class="linkBtn" onclick="resetHistory()">Reset</button></div>
+    </div>
+    <div class="rowLine" style="margin-top:10px">
+      <span><b>Now</b></span>
+      <b id="now" style="font-size:20px">1.00x</b>
+      <span id="target" class="muted">—</span>
+    </div>
+    <div class="subRow"><div class="muted" id="hist" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"></div></div>
+  </section>
 
-  coinEl.textContent = coin;
+  <p class="legal">18+ 娱乐用途 · 虚拟娱乐币 · 无真实赌博/无兑现</p>
+</main>
 
-  let timer = null;
-  let mult = 1;
-  let running = false;
+<script type="module">
+import { getCoin, setCoin, onPlay, vipParams } from "./progress.js";
 
-  function save(){
-    localStorage.setItem("coin", coin);
-    coinEl.textContent = coin;
+let coin = getCoin();
+const coinEl = document.getElementById("coin");
+const msgEl = document.getElementById("msg");
+const nowEl = document.getElementById("now");
+const targetEl = document.getElementById("target");
+const autoText = document.getElementById("autoText");
+const histEl = document.getElementById("hist");
+
+let running=false, timer=null;
+let mult=1.0;
+let stake=100;
+let auto=0;
+let crashPoint=0;
+
+const histKey="crash_hist20";
+let hist = JSON.parse(localStorage.getItem(histKey) || "[]");
+renderHist();
+
+function save(){ setCoin(coin); coinEl.textContent = coin; }
+save();
+
+function sampleCrashPoint(){
+  // 预设爆点：重尾分布（更像真实 crash）
+  // r 越接近 1，爆点越大
+  const r = Math.random();
+  const base = 0.99 / (1 - r); // heavy tail
+  const capped = Math.min(base, 50); // 上限 50x（可调）
+  return Math.max(1.01, Number(capped.toFixed(2)));
+}
+
+function renderHist(){
+  histEl.innerHTML="";
+  hist.forEach(x=>{
+    const d=document.createElement("span");
+    d.textContent = x.toFixed(2)+"x";
+    d.style.display="inline-grid";
+    d.style.placeItems="center";
+    d.style.width="58px";
+    d.style.height="26px";
+    d.style.borderRadius="10px";
+    d.style.border="1px solid #e6eaf2";
+    d.style.background = x<2 ? "#fff7ed" : x<5 ? "#eef2ff" : "#ecfeff";
+    histEl.appendChild(d);
+  });
+}
+window.resetHistory=()=>{
+  hist=[];
+  localStorage.setItem(histKey, JSON.stringify(hist));
+  renderHist();
+};
+
+window.setAuto=(x)=>{
+  auto=x;
+  autoText.textContent = auto===0 ? "Off" : auto.toFixed(2)+"x";
+};
+
+function tick(){
+  // 增长曲线（前快后慢）
+  mult += 0.02 + mult*0.012;
+  mult = Number(mult.toFixed(2));
+  nowEl.textContent = mult.toFixed(2)+"x";
+
+  // 自动提现
+  if(auto>0 && mult >= auto){
+    cashout(true);
+    return;
   }
-  function goHome(){ location.href="index.html"; }
 
-  function start(){
-    if(running) return;
-    if(coin < 100){ alert("余额不足"); return; }
-
-    coin -= 100;
-    save();
-
-    running = true;
-    mult = 1;
-    setUI();
-
-    timer = setInterval(()=>{
-      // 增长
-      mult += 0.06 + Math.random()*0.04;
-
-      // 爆炸概率随倍数上升（更像赌场）
-      const boomChance = Math.min(0.02 + mult*0.01, 0.35);
-
-      if(Math.random() < boomChance){
-        stopRun(true);
-        return;
-      }
-      setUI();
-    }, 220);
-
-    msgEl.textContent = "进行中…随时退出兑现！";
+  // 到达爆点
+  if(mult >= crashPoint){
+    boom();
   }
+}
 
-  function setUI(){
-    const t = mult.toFixed(2) + "x";
-    multiEl.textContent = t;
-    bigEl.textContent = t;
-  }
+function boom(){
+  stop();
+  msgEl.textContent = `💥 爆了！爆点 ${crashPoint.toFixed(2)}x`;
+  targetEl.textContent = `CRASH @ ${crashPoint.toFixed(2)}x`;
+  hist.unshift(crashPoint);
+  hist=hist.slice(0,20);
+  localStorage.setItem(histKey, JSON.stringify(hist));
+  renderHist();
 
-  function stopRun(boom){
-    clearInterval(timer);
-    timer = null;
-    running = false;
+  // 任务
+  const task = onPlay("crash");
+  if(task.got>0) msgEl.textContent += ` ｜✅任务 +${task.got}`;
+}
 
-    if(boom){
-      msgEl.textContent = "💥 爆了！本局归零";
-      mult = 1;
-      setUI();
-    }
-  }
+function stop(){
+  running=false;
+  if(timer) clearInterval(timer);
+  timer=null;
+}
 
-  function cashout(){
-    if(!running){ alert("还没开始"); return; }
-    clearInterval(timer);
-    timer = null;
-    running = false;
+window.start=()=>{
+  if(running) return;
 
-    const win = Math.floor(100 * mult);
-    coin += win;
-    save();
+  const { costFactor } = vipParams();
+  const cost = Math.floor(stake * costFactor);
+  if(coin < cost){ alert("余额不足"); return; }
+  coin -= cost; save();
 
-    msgEl.textContent = `🎉 退出成功 +${win}（倍率 ${mult.toFixed(2)}x）`;
-    mult = 1;
-    setUI();
-  }
+  mult=1.00;
+  crashPoint = sampleCrashPoint();
+
+  nowEl.textContent="1.00x";
+  targetEl.textContent="—";
+
+  running=true;
+  msgEl.textContent = `进行中… 本局扣 ${cost}，爆点已预设`;
+  timer=setInterval(tick, 120);
+};
+
+window.cashout=(autoMode=false)=>{
+  if(!running) { if(!autoMode) alert("还没开始"); return; }
+  stop();
+
+  const { winBoost } = vipParams();
+  const win = Math.floor(stake * mult * winBoost);
+  coin += win; save();
+
+  msgEl.textContent = `✅ 提现成功 +${win}（${mult.toFixed(2)}x）`;
+  targetEl.textContent = `CASHED @ ${mult.toFixed(2)}x`;
+
+  // 历史记录“兑现点”不写入，仍写爆点（更像平台）
+  const task = onPlay("crash");
+  if(task.got>0) msgEl.textContent += ` ｜✅任务 +${task.got}`;
+};
+
 </script>
 </body>
 </html>
