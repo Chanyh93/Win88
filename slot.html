@@ -3,71 +3,264 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>WIN88 · 娱乐老虎机</title>
+  <title>WIN88 · Slots</title>
   <link rel="stylesheet" href="casino.css"/>
 </head>
-<body>
-<header class="topbar">
-  <div class="logo">🎰 老虎机</div>
-  <div class="wallet">
-    💰 <span id="coin">0</span>
-    <button onclick="goHome()">返回大厅</button>
+<body class="app">
+
+<header class="appbar">
+  <button class="iconBtn" onclick="location.href='index.html'">‹</button>
+  <div class="brandCenter">
+    <div class="brandMark">🎰</div>
+    <div class="brandText">Slots</div>
   </div>
+  <button class="iconBtn" onclick="location.href='vip.html'">👑</button>
 </header>
 
-<section class="hero">
-  <h2>旋转（每次 100）</h2>
-  <div style="font-size:54px;font-weight:900;margin:10px 0;" id="reel">🍒 🍋 ⭐</div>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-    <button class="vip" onclick="spin()">旋转</button>
-    <button onclick="auto()">自动 10 次</button>
-  </div>
-  <p id="msg">三连一样 = 爆分 +800</p>
-</section>
+<main class="container">
+  <section class="walletCard">
+    <div class="walletTop">
+      <div class="walletTitle">Balance</div>
+      <div class="walletActions">
+        <button class="pillBtn" onclick="showPaytable()">Paytable</button>
+        <button class="pillBtn" onclick="auto10()">Auto 10</button>
+      </div>
+    </div>
+    <div class="walletBottom">
+      <div class="balancePill">
+        <span class="ccy">COIN</span>
+        <span class="amt" id="coin">—</span>
+      </div>
+      <button class="syncBtn" onclick="spin()">SPIN</button>
+    </div>
+    <div class="subRow"><div class="muted" id="msg">Scatter ≥ 3 触发 Free Spins（8 次）</div></div>
+  </section>
 
-<script>
-  let coin = Number(localStorage.getItem("coin") || 1000);
-  const coinEl = document.getElementById("coin");
-  const reelEl = document.getElementById("reel");
-  const msgEl = document.getElementById("msg");
+  <section class="walletCard" style="margin-top:12px">
+    <div class="walletTop">
+      <div class="walletTitle">Bet</div>
+      <div class="walletActions" style="gap:8px">
+        <button class="tab" onclick="setBet(20)">20</button>
+        <button class="tab active" onclick="setBet(50)">50</button>
+        <button class="tab" onclick="setBet(100)">100</button>
+        <button class="tab" onclick="setBet(200)">200</button>
+      </div>
+    </div>
 
-  coinEl.textContent = coin;
-  const icons = ["🍒","🍋","⭐","💎","7️⃣"];
+    <div id="grid" style="margin-top:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
 
-  function save(){
-    localStorage.setItem("coin", coin);
-    coinEl.textContent = coin;
+    <div class="subRow">
+      <div class="muted">Free Spins: <b id="fs">0</b></div>
+    </div>
+  </section>
+
+  <p class="legal">18+ 娱乐用途 · 虚拟娱乐币 · 无真实赌博/无兑现</p>
+</main>
+
+<script type="module">
+import { getCoin, setCoin, onPlay, vipParams } from "./progress.js";
+
+let coin = getCoin();
+const coinEl = document.getElementById("coin");
+const msgEl = document.getElementById("msg");
+const gridEl = document.getElementById("grid");
+const fsEl = document.getElementById("fs");
+
+let bet = 50;
+let freeSpins = 0;
+let spinning = false;
+
+// Symbols
+const W="🃏";     // Wild
+const S="🎁";     // Scatter
+const A="7️⃣";
+const B="💎";
+const C="⭐";
+const D="🍒";
+const E="🍋";
+
+const reels = [
+  [E,D,C,C,B,A,S,E,D,W], // 每列一个“卷”
+  [E,D,C,B,B,A,S,E,D,W],
+  [E,D,C,B,A,A,S,E,D,W],
+  [E,D,C,C,B,A,S,E,D,W],
+  [E,D,C,B,B,A,S,E,D,W],
+];
+
+const pay = {
+  [A]: {3:8, 4:20, 5:60},
+  [B]: {3:6, 4:15, 5:45},
+  [C]: {3:5, 4:12, 5:35},
+  [D]: {3:4, 4:10, 5:28},
+  [E]: {3:3, 4:8,  5:22},
+  [S]: {3:0, 4:0,  5:0},
+  [W]: {3:10,4:30, 5:80}, // Wild 自己成线也给高点
+};
+
+// 5 条基础线（中间、上、下、V、倒V）
+const lines = [
+  [1,1,1,1,1],
+  [0,0,0,0,0],
+  [2,2,2,2,2],
+  [0,1,2,1,0],
+  [2,1,0,1,2],
+];
+
+function save(){ setCoin(coin); coinEl.textContent = coin; fsEl.textContent = freeSpins; }
+save();
+
+window.setBet = (v)=>{ bet=v; msgEl.textContent=`Bet set to ${bet}`; };
+
+function pickFromReel(i){
+  const r = reels[i];
+  return r[Math.floor(Math.random()*r.length)];
+}
+
+function buildSpinGrid(){
+  // 返回 5x3：grid[col][row]
+  const g = Array.from({length:5}, ()=>Array.from({length:3}, ()=>""));
+  for(let c=0;c<5;c++){
+    for(let r=0;r<3;r++) g[c][r]=pickFromReel(c);
   }
-  function goHome(){ location.href="index.html"; }
+  return g;
+}
 
-  function spin(){
-    if(coin < 100){ alert("余额不足"); return; }
-    coin -= 100;
+function renderGrid(g){
+  gridEl.innerHTML="";
+  // 以行显示更直观：row 0..2，col 0..4
+  for(let r=0;r<3;r++){
+    for(let c=0;c<5;c++){
+      const cell = document.createElement("div");
+      cell.className="rowLine";
+      cell.style.height="56px";
+      cell.style.display="grid";
+      cell.style.placeItems="center";
+      cell.style.fontSize="26px";
+      cell.textContent = g[c][r];
+      gridEl.appendChild(cell);
+    }
+  }
+}
 
-    const r1 = icons[Math.floor(Math.random()*icons.length)];
-    const r2 = icons[Math.floor(Math.random()*icons.length)];
-    const r3 = icons[Math.floor(Math.random()*icons.length)];
-    reelEl.textContent = `${r1} ${r2} ${r3}`;
+function evalLineSymbols(symbols){
+  // symbols: [s1..s5]
+  // 规则：从左起连续相同（Wild 可替代）
+  // 先找第一个非Wild作为主符号
+  let base = symbols.find(x=>x!==W) || W;
+  // Scatter 不参与线奖
+  if(base===S) return {sym:null, count:0, mult:0};
 
-    if(r1===r2 && r2===r3){
-      coin += 800;
-      msgEl.textContent = "🎉 爆分！+800";
-    }else if(r1===r2 || r2===r3 || r1===r3){
-      coin += 150;
-      msgEl.textContent = "✨ 小赢！+150";
+  let count=0;
+  for(let i=0;i<symbols.length;i++){
+    const s = symbols[i];
+    if(s===base || s===W){
+      count++;
     }else{
-      msgEl.textContent = "再来一次！";
+      break;
     }
-    save();
+  }
+  if(count>=3 && pay[base] && pay[base][count]){
+    return {sym:base, count, mult:pay[base][count]};
+  }
+  return {sym:null, count:0, mult:0};
+}
+
+function countScatter(g){
+  let n=0;
+  for(let c=0;c<5;c++) for(let r=0;r<3;r++) if(g[c][r]===S) n++;
+  return n;
+}
+
+function payout(g){
+  let totalMult=0;
+  const wins=[];
+  for(const ln of lines){
+    const symbols = ln.map((row, col)=> g[col][row]);
+    const res = evalLineSymbols(symbols);
+    if(res.mult>0){
+      totalMult += res.mult;
+      wins.push(`${res.sym}×${res.count} (${res.mult}x)`);
+    }
+  }
+  return { totalMult, wins };
+}
+
+async function animateSpin(){
+  // 简单动画：快速刷新几次
+  for(let i=0;i<10;i++){
+    renderGrid(buildSpinGrid());
+    await new Promise(r=>setTimeout(r,60));
+  }
+}
+
+window.showPaytable = ()=>{
+  alert(
+`Paytable（倍率 × Bet）
+7️⃣: 3=8x 4=20x 5=60x
+💎: 3=6x 4=15x 5=45x
+⭐: 3=5x 4=12x 5=35x
+🍒: 3=4x 4=10x 5=28x
+🍋: 3=3x 4=8x  5=22x
+🃏(Wild): 3=10x 4=30x 5=80x
+🎁 Scatter ≥3：Free Spins +8`
+  );
+};
+
+window.spin = async ()=>{
+  if(spinning) return;
+  spinning=true;
+
+  const { costFactor, winBoost } = vipParams();
+  const cost = (freeSpins>0) ? 0 : Math.floor(bet * costFactor);
+
+  if(cost>0 && coin < cost){ alert("余额不足"); spinning=false; return; }
+  if(cost>0){ coin -= cost; }
+
+  await animateSpin();
+  const g = buildSpinGrid();
+  renderGrid(g);
+
+  // Scatter -> Free Spins
+  const sc = countScatter(g);
+  if(sc>=3){
+    freeSpins += 8;
+    msgEl.textContent = `🎁 Scatter ${sc}！Free Spins +8`;
   }
 
-  async function auto(){
-    for(let i=0;i<10;i++){
-      if(coin < 100) break;
-      spin();
-      await new Promise(r=>setTimeout(r,250));
+  // Line wins
+  const res = payout(g);
+  const win = Math.floor(bet * res.totalMult * winBoost);
+  if(win>0){
+    coin += win;
+    msgEl.textContent = `🎉 Win +${win} ｜ ${res.wins.join(" , ")}`;
+  }else if(sc<3){
+    msgEl.textContent = cost===0 ? `Free Spin…` : `No win（扣 ${cost}）`;
+  }
+
+  // Free spin consume
+  if(freeSpins>0){
+    freeSpins -= 1;
+  }
+
+  save();
+
+  const task = onPlay("slot");
+  if(task.got>0) msgEl.textContent += ` ｜✅任务 +${task.got}`;
+
+  spinning=false;
+};
+
+window.auto10 = async ()=>{
+  for(let i=0;i<10;i++){
+    if(!spinning){
+      await window.spin();
+      await new Promise(r=>setTimeout(r,120));
     }
   }
+};
+
+// 初始渲染
+renderGrid(buildSpinGrid());
 </script>
 </body>
 </html>
