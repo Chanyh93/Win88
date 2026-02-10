@@ -3,48 +3,178 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>WIN88 · 娱乐赌场</title>
+  <title>WIN88 · 娱乐大厅</title>
   <link rel="stylesheet" href="casino.css"/>
 </head>
-<body>
+<body class="app">
 
-<header class="topbar">
-  <div class="logo">WIN<span>88</span></div>
-  <div class="wallet">
-    💰 余额：<span id="coin">1000</span>
-   <button onclick="addCoin()">充值</button>
-<button onclick="checkin()">签到</button>
-<button class="vip" onclick="location.href='vip.html'">VIP</button>
+  <!-- 顶部 App Bar（像截图那种） -->
+  <header class="appbar">
+    <button class="iconBtn" onclick="toggleMenu()" aria-label="menu">☰</button>
+
+    <div class="brandCenter">
+      <div class="brandMark">W</div>
+      <div class="brandText">Win<span>88</span></div>
+    </div>
+
+    <button class="iconBtn" onclick="location.href='vip.html'" aria-label="app">📱</button>
+  </header>
+
+  <!-- 主体 -->
+  <main class="container">
+    <!-- Wallet 卡片（像截图 Wallet Balance 那块） -->
+    <section class="walletCard">
+      <div class="walletTop">
+        <div class="walletTitle">
+          Wallet Balance
+          <button class="eye" onclick="toggleBalance()" aria-label="toggle balance">👁</button>
+        </div>
+
+        <div class="walletActions">
+          <button class="linkBtn" onclick="openSheet()">Details ›</button>
+          <button class="linkBtn" onclick="restore()">Restore</button>
+          <button class="pillBtn" onclick="topup()">Top Up</button>
+        </div>
+      </div>
+
+      <div class="walletBottom">
+        <div class="balancePill">
+          <span class="ccy">MYR</span>
+          <span class="amt" id="balanceText">—</span>
+        </div>
+
+        <button class="syncBtn" onclick="sync()">⟳</button>
+        <button class="miniIconBtn" onclick="openApps()">▾</button>
+      </div>
+
+      <div class="subRow">
+        <div class="muted">More applications</div>
+      </div>
+    </section>
+
+    <!-- Tabs（Sports / E-sports / Casino / Slots / Fishing / 4D） -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="sports" onclick="setTab(this)">Sports</button>
+      <button class="tab" data-tab="esports" onclick="setTab(this)">E-Sports</button>
+      <button class="tab" data-tab="casino" onclick="setTab(this)">Casino</button>
+      <button class="tab" data-tab="slots" onclick="setTab(this)">Slots</button>
+      <button class="tab" data-tab="fishing" onclick="setTab(this)">Fishing</button>
+      <button class="tab" data-tab="4d" onclick="setTab(this)">4D</button>
+    </nav>
+
+    <!-- 大 Banner 卡片列表（像你截图那种三张） -->
+    <section class="providers">
+
+      <article class="providerCard promo">
+        <div class="providerLeft">
+          <div class="providerLogo">WIN88</div>
+          <div class="providerName">WIN88 Sports</div>
+          <div class="providerBtns">
+            <button class="ctaBtn" onclick="openGame('baccarat')">Play Now</button>
+            <button class="ghostBtn" onclick="openSheet()">Desktop</button>
+          </div>
+        </div>
+
+        <div class="providerRight">
+          <div class="badge">Promo</div>
+          <div class="players">
+            <div class="p"></div><div class="p"></div><div class="p"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="providerCard hot">
+        <div class="providerLeft">
+          <div class="providerLogo">SABA</div>
+          <div class="providerName">Saba Sports</div>
+          <div class="providerBtns">
+            <button class="ctaBtn" onclick="openGame('slot')">Play Now</button>
+            <button class="ghostBtn" onclick="openSheet()">Desktop</button>
+          </div>
+        </div>
+
+        <div class="providerRight">
+          <div class="badge hotBadge">Hot</div>
+          <div class="players">
+            <div class="p"></div><div class="p"></div><div class="p"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="providerCard">
+        <div class="providerLeft">
+          <div class="providerLogo">CMD</div>
+          <div class="providerName">CMD Sports</div>
+          <div class="providerBtns">
+            <button class="ctaBtn" onclick="openGame('crash')">Play Now</button>
+            <button class="ghostBtn" onclick="openSheet()">Desktop</button>
+          </div>
+        </div>
+
+        <div class="providerRight">
+          <div class="badge hotBadge">Hot</div>
+          <div class="players">
+            <div class="p"></div><div class="p"></div><div class="p"></div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <p class="legal">18+ 娱乐用途 · 虚拟娱乐币 · 无真实赌博/无兑现</p>
+  </main>
+
+  <!-- 浮动客服按钮（像右下角聊天） -->
+  <button class="floatChat" onclick="location.href='partners.html'" aria-label="chat">
+    💬
+  </button>
+
+  <!-- 底部导航（像 Home / Funds / …） -->
+  <nav class="bottomNav">
+    <button class="navItem active" onclick="location.href='index.html'">🏠<span>Home</span></button>
+    <button class="navItem" onclick="openSheet()">💰<span>Funds</span></button>
+    <button class="navItem" onclick="checkin()">🎁<span>Check-in</span></button>
+    <button class="navItem" onclick="location.href='vip.html'">👑<span>Account</span></button>
+  </nav>
+
+  <script type="module" src="casino.js"></script>
+
+  <!-- 轻量“弹层” -->
+  <div class="sheet" id="sheet" aria-hidden="true">
+    <div class="sheetMask" onclick="closeSheet()"></div>
+    <div class="sheetCard">
+      <div class="sheetTop">
+        <div class="sheetTitle">Wallet Details</div>
+        <button class="iconBtn" onclick="closeSheet()">✕</button>
+      </div>
+      <div class="sheetBody">
+        <div class="rowLine"><span>Balance</span><b id="sheetBalance">—</b></div>
+        <div class="rowLine"><span>VIP</span><b id="sheetVip">—</b></div>
+        <div class="rowLine"><span>Today</span><b id="sheetDay">—</b></div>
+        <button class="ctaWide" onclick="topup()">Top Up (Entertainment)</button>
+        <button class="ghostWide" onclick="location.href='vip.html'">Open VIP</button>
+      </div>
+    </div>
   </div>
-</header>
 
-<section class="hero">
-  <h1>马来西亚最火的<br><span>娱乐赌场</span></h1>
-  <p>百家乐 · 老虎机 · Crash｜纯娱乐 · 高刺激</p>
-</section>
+  <script>
+    function toggleMenu(){ alert("菜单（后续可做：公告/活动/客服）"); }
+    function openApps(){ alert("更多应用（后续可做更多入口）"); }
 
-<section class="lobby">
-  <div class="game-card" onclick="openGame('baccarat')">
-    <h2>🎴 百家乐</h2>
-    <p>庄 / 闲 / 和 · 路单</p>
-  </div>
+    function setTab(btn){
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      btn.classList.add("active");
+    }
 
-  <div class="game-card" onclick="openGame('slot')">
-    <h2>🎰 老虎机</h2>
-    <p>自动旋转 · 爆分</p>
-  </div>
+    function openSheet(){
+      document.getElementById("sheet").classList.add("show");
+      document.getElementById("sheet").setAttribute("aria-hidden","false");
+    }
+    function closeSheet(){
+      document.getElementById("sheet").classList.remove("show");
+      document.getElementById("sheet").setAttribute("aria-hidden","true");
+    }
+  </script>
 
-  <div class="game-card" onclick="openGame('crash')">
-    <h2>💥 Crash</h2>
-    <p>翻倍曲线 · 随时退出</p>
-  </div>
-</section>
-
-<footer>
-  <button class="real" onclick="location.href='partners.html'">🔥 合作伙伴</button>
-  <p>18+ 娱乐用途 · 无真实赌博</p>
-</footer>
-
-<script type="module" src="casino.js"></script>
 </body>
 </html>
