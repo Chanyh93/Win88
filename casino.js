@@ -1,29 +1,29 @@
-let coin = Number(localStorage.getItem("coin") || 1000);
+import { getCoin, setCoin, doCheckin } from "./progress.js";
+
+let coin = getCoin();
 update();
 
 function update(){
-  document.getElementById("coin").innerText = coin;
-  localStorage.setItem("coin", coin);
+  const el = document.getElementById("coin");
+  if(el) el.innerText = coin;
+  setCoin(coin);
 }
 
-function addCoin(){
+window.addCoin = function(){
   coin += 500;
   update();
   alert("充值成功 +500（娱乐币）");
 }
 
-function openGame(type){
-  if(type === "baccarat"){
-    window.location.href = "baccarat.html";
-  }
-  if(type === "slot"){
-    window.location.href = "slot.html";
-  }
-  if(type === "crash"){
-    window.location.href = "crash.html";
-  }
+window.checkin = function(){
+  const r = doCheckin();
+  coin = getCoin();
+  update();
+  alert(r.ok ? `✅ 签到成功 +${r.bonus}` : r.msg);
 }
 
-function goReal(){
-  alert("这里将放 BK8 / WE1WIN 联盟链接（STEP 4）");
+window.openGame = function(type){
+  if(type==="baccarat") location.href="baccarat.html";
+  if(type==="slot") location.href="slot.html";
+  if(type==="crash") location.href="crash.html";
 }
